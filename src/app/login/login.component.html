@@ -1,0 +1,50 @@
+<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.6.1/firebase-ui-auth.css" />
+
+<style>
+  #fullscreen-login{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow-y: hidden;
+    margin: -5px;
+    padding: 0;
+    height: 100vh;
+    background-image: radial-gradient(73% 147%, #EADFDF 59%, #ECE2DF 100%), radial-gradient(91% 146%, rgba(255,255,255,0.50) 47%, rgba(0,0,0,0.50) 100%);
+    background-blend-mode: screen;
+  }
+
+  #firebaseui-auth-container {
+    margin-top: 10vh;
+  }
+
+  #loading {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #000;
+    animation: spin 1s ease-in-out infinite;
+    -webkit-animation: spin 1s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    to { -webkit-transform: rotate(360deg); }
+  }
+  @-webkit-keyframes spin {
+    to { -webkit-transform: rotate(360deg); }
+  }
+</style>
+
+<section id="fullscreen-login">
+  <div>
+    A single-page note taking tool.
+    <br> <br>
+    Because all your thoughts are connected.
+  </div>
+  <div id="firebaseui-auth-container">
+    <span *ngIf="showSpinner" id="loading"></span>
+  </div>
+</section>
