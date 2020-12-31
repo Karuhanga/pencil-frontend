@@ -1,4 +1,8 @@
 <style>
+  #editor.hidden {
+    visibility: hidden;
+  }
+
   #last-updated {
     width: 100%;
     padding-right: 20px;
@@ -12,6 +16,7 @@
     margin: 6vh 6vw;
     padding: 3vh 3vw;
     border: .5px solid rgba(0, 0, 0 , .1);
+    min-height: 50vw;
   }
 
   #editor-container [contenteditable="true"]:focus {
@@ -21,10 +26,6 @@
   #loading {
     margin-top: 10vw;
     text-align: center;
-  }
-
-  #editor {
-    min-height: 50vw;
   }
 </style>
 

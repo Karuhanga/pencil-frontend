@@ -1,9 +1,12 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
 import * as MediumEditor from 'medium-editor';
-import * as moment from 'moment';
-
 import "node_modules/medium-editor/dist/js/medium-editor.min.js";
+import * as moment from 'moment';
+// @ts-ignore
+import { parse, HtmlGenerator } from 'latex.js'
+
 import {PersistenceService} from "../persistence.service";
+import {buildLatexExtension} from "./extensions";
 
 
 const PERSIST_LAG_SECONDS = 15;
@@ -17,7 +20,7 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
   @ViewChild('editor', {static: true}) editorRef?: ElementRef;
 
   mediumEditor?: MediumEditor.MediumEditor;
-  content?: string;
+  private content?: string;
   contentLoading = true;
   lastUpdated?: moment.Moment;
 
@@ -25,7 +28,7 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.initContent();
+    this.hydrateContent();
   }
 
   ngOnDestroy(): void {
@@ -33,9 +36,9 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
     this.mediumEditor = undefined;
   }
 
-  private initContent() {
+  private hydrateContent() {
     this.persistenceService.getNote().then(snapshot => {
-      this.content = snapshot.data()?.content;
+      this.setEditorContent(snapshot.data()?.content);
       this.lastUpdated = moment();
     }).finally(() => this.setupEditor());
   }
@@ -46,22 +49,48 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
         hideOnClick: false,
         text: "Your thoughts here...",
       },
+      extensions: {
+        // finally abandoned this bc the event is not being triggered for some reason
+        // latexExtension: buildLatexExtension(),
+      }
     });
-    this.mediumEditor?.setContent(this.content || "");
+    this.mediumEditor?.setContent(this.getEditorContent());
     this.mediumEditor.subscribe('editableInput', () => this.updateContent());
     this.contentLoading = false;
   }
 
   private updateContent() {
-    this.content = this.mediumEditor?.getContent();
+    this.setEditorContent(this.parseLatex(this.mediumEditor?.getContent()));
+    this.mediumEditor?.setContent(this.getEditorContent());
     if (this.shouldSave()) {
-      this.persistenceService.writeNote(this.content || "").then(() => {
+      this.persistenceService.writeNote(this.getEditorContent()).then(() => {
         this.lastUpdated = moment();
-      });
+      }).catch(console.error);
     }
+  }
+
+  private parseLatex(html?: string) {
+    return html?.replace(/\$(.*?)\$/g, formula => {
+      return getFragmentHtml(parse(formula, { generator: new HtmlGenerator({ hyphenate: false }) }).domFragment());
+    })
   }
 
   private shouldSave() {
     return !this.lastUpdated || (moment().diff(this.lastUpdated) / 1000) > PERSIST_LAG_SECONDS;
   }
+
+  getEditorContent() {
+    return this.content || "";
+  }
+
+  setEditorContent(content?: string) {
+    this.content = content;
+  }
+}
+
+
+function getFragmentHtml(fragment: DocumentFragment) {
+  const div = document.createElement('div');
+  div.appendChild( fragment.cloneNode(true) );
+  return div.innerHTML;
 }
