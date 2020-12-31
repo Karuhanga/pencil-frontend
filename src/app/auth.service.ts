@@ -22,7 +22,7 @@ export class AuthService {
 
   initLoginButton(element: string, onSetupComplete: () => void) {
     const authService = this;
-    function initButton() {
+    function setupLoginButton() {
       authService.ui.start(element, {
         signInOptions: [
           firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -36,7 +36,9 @@ export class AuthService {
       onSetupComplete();
     }
 
-    setTimeout(initButton, 1500); // artificial delay to avoid jarring button jump
+    setTimeout(() => {
+      if (!authService.isLoggedIn()) setupLoginButton();
+    }, 1500); // artificial delay to avoid jarring button jump
   }
 
   isLoggedIn() {
