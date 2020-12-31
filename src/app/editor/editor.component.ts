@@ -5,7 +5,6 @@ import * as moment from 'moment';
 
 import {PersistenceService} from "../persistence.service";
 import {parseLatex} from "./extensions";
-import {BehaviorSubject} from "rxjs";
 
 
 const PERSIST_LAG_SECONDS = 15;
@@ -19,7 +18,6 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
   @ViewChild('editor', {static: true}) editorRef?: ElementRef;
 
   mediumEditor?: MediumEditor.MediumEditor;
-  readonly content = new BehaviorSubject<string|undefined>(undefined);
   contentLoading = true;
   lastUpdated?: moment.Moment;
 
@@ -35,13 +33,15 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
   }
 
   private initContent() {
+    let content: string | undefined;
+
     this.persistenceService.getNote().then(snapshot => {
-      this.content.next(snapshot.data()?.content);
+      content = snapshot.data()?.content;
       this.lastUpdated = moment();
-    }).finally(() => this.setupEditor());
+    }).finally(() => this.setupEditor(content));
   }
 
-  private setupEditor() {
+  private setupEditor(content?: string) {
     this.mediumEditor = new MediumEditor(this.editorRef?.nativeElement, {
       placeholder: {
         hideOnClick: false,
@@ -52,24 +52,23 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
         // latexExtension: buildLatexExtension(),
       }
     });
+    this.mediumEditor.setContent(content || "");
     this.setupSubscribers();
     this.contentLoading = false;
   }
 
   private setupSubscribers() {
-    this.content.subscribe(content => this.mediumEditor?.setContent(content || ""));
-    this.content.subscribe(content => {
+    this.mediumEditor?.subscribe('editableInput', () => {
+      const currentContent = this.mediumEditor?.getContent();
+      const newContent = parseLatex(currentContent) || "";
+
+      if (currentContent === newContent) return;
+
+      this.mediumEditor?.setContent(newContent);
       if (this.shouldSave()) {
-        this.persistenceService.writeNote(content || "").then(() => {
+        this.persistenceService.writeNote(newContent).then(() => {
           this.lastUpdated = moment();
         }).catch(console.error);
-      }
-    });
-
-    this.mediumEditor?.subscribe('editableInput', () => {
-      const newContent = parseLatex(this.mediumEditor?.getContent());
-      if (this.content.getValue() !== newContent){
-        this.content.next(newContent);
       }
     });
   }

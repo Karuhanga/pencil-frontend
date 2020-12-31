@@ -12,7 +12,6 @@ export function buildLatexExtension() {
       if (node.hasChildNodes() || !node.innerText.match(/^\$.*\$$/g)) return;
       node.innerText = parseLatex(node.innerText) || "";
     },
-    init: function () { console.log(34) },
   });
 
   return new MyExtension();
