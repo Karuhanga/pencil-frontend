@@ -22,6 +22,7 @@
     "firebase": "^8.2.1",
     "firebaseui": "^4.7.1",
     "medium-editor": "^5.23.3",
+    "moment": "^2.29.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.0.0",
     "zone.js": "~0.10.2"

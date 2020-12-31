@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import firebase from "firebase/app";
 import "firebase/firestore";
@@ -12,13 +12,19 @@ const COLLECTION = 'notes';
   providedIn: 'root'
 })
 export class PersistenceService {
+  private submitting = false;
 
-  constructor(private firebaseService: FirebaseService, private authService: AuthService) { }
+  constructor(private firebaseService: FirebaseService, private authService: AuthService) {
+  }
 
   writeNote(content: string) {
+    if (this.submitting) return Promise.reject("Still submitting.");
     const db = firebase.firestore();
-    return db.collection(COLLECTION).doc(this.authService.userSubject.getValue()?.uid).set({
-      content,
+
+    this.submitting = true;
+    return db.collection(COLLECTION).doc(this.authService.userSubject.getValue()?.uid).set({content})
+      .finally(() => {
+        this.submitting = false;
     });
   }
 

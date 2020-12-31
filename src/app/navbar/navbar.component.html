@@ -2,22 +2,30 @@
   nav {
     width: 100vw;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: end;
-    justify-content: center;
+    justify-content: space-between;
   }
 
   #logout-button {
     margin: 10px;
     padding: 6px 10px;
     background: transparent;
-    box-shadow: none;
     border: 1px solid;
     font-size: medium;
     cursor: pointer;
   }
+
+  #logo {
+    margin: 10px;
+    padding: 6px 10px;
+    font-size: medium;
+    font-weight: bold;
+    text-decoration: underline;
+  }
 </style>
 
 <nav>
+  <span id="logo">Pencil</span>
   <span id="logout-button" (click)="logout()" *ngIf="isLoggedIn()">Logout</span>
 </nav>

@@ -15,7 +15,8 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private router: Router,
-  ) { }
+  ) {
+  }
 
   ngOnInit() {
     this.userSubjectSubscription = this.authService.userSubject.subscribe(user => {
