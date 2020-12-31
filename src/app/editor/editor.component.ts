@@ -7,6 +7,7 @@ import { parse, HtmlGenerator } from 'latex.js'
 
 import {PersistenceService} from "../persistence.service";
 import {buildLatexExtension} from "./extensions";
+import {BehaviorSubject} from "rxjs";
 
 
 const PERSIST_LAG_SECONDS = 15;
@@ -20,15 +21,14 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
   @ViewChild('editor', {static: true}) editorRef?: ElementRef;
 
   mediumEditor?: MediumEditor.MediumEditor;
-  private content?: string;
+  readonly content = new BehaviorSubject<string|undefined>(undefined);
   contentLoading = true;
   lastUpdated?: moment.Moment;
 
-  constructor(private persistenceService: PersistenceService) {
-  }
+  constructor(private persistenceService: PersistenceService) {}
 
   ngAfterViewInit(): void {
-    this.hydrateContent();
+    this.initContent();
   }
 
   ngOnDestroy(): void {
@@ -36,9 +36,9 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
     this.mediumEditor = undefined;
   }
 
-  private hydrateContent() {
+  private initContent() {
     this.persistenceService.getNote().then(snapshot => {
-      this.setEditorContent(snapshot.data()?.content);
+      this.content.next(snapshot.data()?.content);
       this.lastUpdated = moment();
     }).finally(() => this.setupEditor());
   }
@@ -54,19 +54,26 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
         // latexExtension: buildLatexExtension(),
       }
     });
-    this.mediumEditor?.setContent(this.getEditorContent());
-    this.mediumEditor.subscribe('editableInput', () => this.updateContent());
+    this.setupSubscribers();
     this.contentLoading = false;
   }
 
-  private updateContent() {
-    this.setEditorContent(this.parseLatex(this.mediumEditor?.getContent()));
-    this.mediumEditor?.setContent(this.getEditorContent());
-    if (this.shouldSave()) {
-      this.persistenceService.writeNote(this.getEditorContent()).then(() => {
-        this.lastUpdated = moment();
-      }).catch(console.error);
-    }
+  private setupSubscribers() {
+    this.content.subscribe(content => this.mediumEditor?.setContent(content || ""));
+    this.content.subscribe(content => {
+      if (this.shouldSave()) {
+        this.persistenceService.writeNote(content || "").then(() => {
+          this.lastUpdated = moment();
+        }).catch(console.error);
+      }
+    });
+
+    this.mediumEditor?.subscribe('editableInput', () => {
+      const newContent = this.parseLatex(this.mediumEditor?.getContent());
+      if (this.content.getValue() != newContent){
+        this.content.next(newContent);
+      }
+    });
   }
 
   private parseLatex(html?: string) {
@@ -77,14 +84,6 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
 
   private shouldSave() {
     return !this.lastUpdated || (moment().diff(this.lastUpdated) / 1000) > PERSIST_LAG_SECONDS;
-  }
-
-  getEditorContent() {
-    return this.content || "";
-  }
-
-  setEditorContent(content?: string) {
-    this.content = content;
   }
 }
 
