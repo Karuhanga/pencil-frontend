@@ -93,9 +93,7 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": [
-              "node_modules/medium-editor/dist/js/medium-editor.min.js"
-            ]
+            "scripts": []
           }
         },
         "lint": {
