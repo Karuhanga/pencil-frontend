@@ -2,11 +2,9 @@ import {AfterViewInit, Component, ElementRef, OnDestroy, ViewChild} from '@angul
 import * as MediumEditor from 'medium-editor';
 import "node_modules/medium-editor/dist/js/medium-editor.min.js";
 import * as moment from 'moment';
-// @ts-ignore
-import { parse, HtmlGenerator } from 'latex.js'
 
 import {PersistenceService} from "../persistence.service";
-import {buildLatexExtension} from "./extensions";
+import {parseLatex} from "./extensions";
 import {BehaviorSubject} from "rxjs";
 
 
@@ -69,27 +67,14 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
     });
 
     this.mediumEditor?.subscribe('editableInput', () => {
-      const newContent = this.parseLatex(this.mediumEditor?.getContent());
-      if (this.content.getValue() != newContent){
+      const newContent = parseLatex(this.mediumEditor?.getContent());
+      if (this.content.getValue() !== newContent){
         this.content.next(newContent);
       }
     });
   }
 
-  private parseLatex(html?: string) {
-    return html?.replace(/\$(.*?)\$/g, formula => {
-      return getFragmentHtml(parse(formula, { generator: new HtmlGenerator({ hyphenate: false }) }).domFragment());
-    })
-  }
-
   private shouldSave() {
     return !this.lastUpdated || (moment().diff(this.lastUpdated) / 1000) > PERSIST_LAG_SECONDS;
   }
-}
-
-
-function getFragmentHtml(fragment: DocumentFragment) {
-  const div = document.createElement('div');
-  div.appendChild( fragment.cloneNode(true) );
-  return div.innerHTML;
 }
