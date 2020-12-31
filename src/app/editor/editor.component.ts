@@ -27,15 +27,16 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
         text: "Your thoughts here...",
       },
     });
-    this.mediumEditor.subscribe('editableInput', this.updateContent);
+    this.mediumEditor.subscribe('editableInput', () => this.updateContent());
     this.initContent();
   }
 
   initContent() {
     this.persistenceService.getNote().then(snapshot => {
       this.content = snapshot.data()?.toString();
+      this.mediumEditor?.setContent(this.content || "df");
       this.contentLoading = false;
-    })
+    });
   }
 
   updateContent() {

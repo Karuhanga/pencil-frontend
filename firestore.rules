@@ -1,7 +1,9 @@
 rules_version = '2';
 service cloud.firestore {
-  match /databases/notes/documents/{uid} {
-    allow create, read, update:
-        if uid == request.auth.uid;
+  match /databases/{database}/documents {
+    match /notes/{uid} {
+      allow create, read, update:
+          if uid == request.auth.uid;
+    }
   }
 }

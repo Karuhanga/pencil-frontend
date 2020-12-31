@@ -19,6 +19,6 @@
 </style>
 
 <div id="editor-container">
-  <div id="loading" class="spinner" [class.hidden]="!contentLoading"></div>
+  <div id="loading" class="spinner" *ngIf="contentLoading"></div>
   <textarea #editor [class.hidden]="contentLoading"></textarea>
 </div>
