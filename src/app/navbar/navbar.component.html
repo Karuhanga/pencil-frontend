@@ -1,0 +1,23 @@
+<style>
+  nav {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    justify-content: center;
+  }
+
+  #logout-button {
+    margin: 10px;
+    padding: 6px 10px;
+    background: transparent;
+    box-shadow: none;
+    border: 1px solid;
+    font-size: medium;
+    cursor: pointer;
+  }
+</style>
+
+<nav>
+  <span id="logout-button" (click)="logout()" *ngIf="isLoggedIn()">Logout</span>
+</nav>

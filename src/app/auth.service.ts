@@ -16,10 +16,7 @@ export class AuthService {
 
   constructor(private firebaseService: FirebaseService) {
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-    firebase.auth().onAuthStateChanged(user => {
-      console.log(user)
-      this.userSubject.next(user);
-    });
+    firebase.auth().onAuthStateChanged(user => this.userSubject.next(user));
     this.ui = new firebaseui.auth.AuthUI(firebase.auth());
   }
 
@@ -40,5 +37,13 @@ export class AuthService {
     }
 
     setTimeout(initButton, 1500); // artificial delay to avoid jarring button jump
+  }
+
+  isLoggedIn() {
+    return !!this.userSubject.getValue();
+  }
+
+  logout() {
+    if (this.isLoggedIn()) firebase.auth().signOut();
   }
 }
