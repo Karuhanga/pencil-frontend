@@ -20,7 +20,7 @@
 
   #loading {
     margin-top: 10vw;
-    margin-left: 48%;
+    text-align: center;
   }
 
   #editor {
@@ -30,7 +30,11 @@
 
 <div>
   <div id="editor-container">
-    <div id="loading" class="spinner" *ngIf="contentLoading"></div>
+    <div id="loading" *ngIf="contentLoading">
+      <span class="spinner"></span>
+      <br>
+      <small>Rolling out your scroll, sire</small>
+    </div>
     <div id="last-updated" *ngIf="lastUpdated">Last synced: {{lastUpdated.fromNow()}}</div>
     <div #editor id="editor" [class.hidden]="contentLoading"></div>
   </div>
