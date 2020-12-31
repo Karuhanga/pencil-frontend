@@ -1,1 +1,24 @@
-<p>editor works!</p>
+<style>
+  .hidden {
+    visibility: hidden;
+  }
+
+  #editor-container {
+    margin: 6vh 6vw;
+    border-top: .5px solid black;
+  }
+
+  #editor-container [contenteditable="true"]:focus {
+    outline: none;
+  }
+
+  #loading {
+    margin-top: 10vw;
+    margin-left: 50%;
+  }
+</style>
+
+<div id="editor-container">
+  <div id="loading" class="spinner" [class.hidden]="!contentLoading"></div>
+  <textarea #editor [class.hidden]="contentLoading"></textarea>
+</div>
