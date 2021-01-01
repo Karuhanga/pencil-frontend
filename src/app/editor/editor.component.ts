@@ -3,6 +3,9 @@ import * as MediumEditor from 'medium-editor';
 import "node_modules/medium-editor/dist/js/medium-editor.min.js";
 import * as moment from 'moment';
 
+// @ts-ignore
+import debounce from "lodash.debounce";
+
 import {PersistenceService} from "../persistence.service";
 
 
@@ -57,33 +60,28 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
   }
 
   private setupSubscribers() {
+    const debouncedPersist = debounce((content: string) => this.persist(content), PERSIST_LAG_SECONDS*1000, {leading: true});
+
     this.mediumEditor?.subscribe('editableInput', () => {
-      console.log("subscriber called...")
-      const currentContent = this.mediumEditor?.getContent();
-      const newContent = this.parseLatex(currentContent) || "";
+      const content = this.mediumEditor?.getContent();
+      const parsedContent = EditorComponent.parseLatex(content) || "";
 
-      if (currentContent === newContent) return;
-
-      console.log("setting...", currentContent, newContent)
-      this.mediumEditor?.setContent(newContent);
-      if (this.shouldSave()) {
-        console.log("saving...")
-        this.persistenceService.writeNote(newContent).then(() => {
-          this.lastUpdated = moment();
-        }).catch(console.error);
-      }
+      debouncedPersist(parsedContent);
+      if (content !== parsedContent) this.mediumEditor?.setContent(parsedContent);
     });
   }
 
-  private shouldSave() {
-    return !this.lastUpdated || (moment().diff(this.lastUpdated) / 1000) > PERSIST_LAG_SECONDS;
+  private persist(content: string) {
+    return this.persistenceService.writeNote(content).then(() => {
+      this.lastUpdated = moment();
+    }).catch(console.error);
   }
 
-  private parseLatex(html?: string) {
-    console.log("parsing...")
+  private static parseLatex(html?: string) {
+    // not very performant, but as mentioned earlier, I needed more time to figure out why the extension's change
+    // listeners weren't being triggered. If those worked, we an restrict this parsing to a single, tiny node :)
     return html?.replace(/\$(.*?)\$/g, (formula, withoutDollars) => {
-      console.log("replacing...")
-      return `<latex-js baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">\\[ ${withoutDollars} \\]</latex-js><span> </span>`
+      return `<latex-js baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">\\[ ${withoutDollars} \\]</latex-js>`
     })
   }
 }
