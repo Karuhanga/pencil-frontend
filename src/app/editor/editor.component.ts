@@ -83,7 +83,7 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
     console.log("parsing...")
     return html?.replace(/\$(.*?)\$/g, (formula, withoutDollars) => {
       console.log("replacing...")
-      return `<latex-js baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">\\ ${withoutDollars}</latex-js>`
+      return `<latex-js baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">\\[ ${withoutDollars} \\]</latex-js><span> </span>`
     })
   }
 }

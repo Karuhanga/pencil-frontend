@@ -9,7 +9,6 @@ import {EditorComponent} from './editor/editor.component';
 import {FirebaseService} from "./firebase.service";
 import {AuthService} from "./auth.service";
 import {NavbarComponent} from './navbar/navbar.component';
-import { LatexViewerComponent } from './latex-viewer/latex-viewer.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +16,6 @@ import { LatexViewerComponent } from './latex-viewer/latex-viewer.component';
     LoginComponent,
     EditorComponent,
     NavbarComponent,
-    LatexViewerComponent
   ],
   imports: [
     BrowserModule,

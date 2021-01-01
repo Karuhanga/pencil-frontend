@@ -34,8 +34,6 @@ body {
 /*end spinner*/
 
 latex-js {
-  display: inline;
-  width: 10%;
-  border: .5px solid rgba(0, 0, 0 , .1);
-  margin-right: 2em;
+  display: inline-block;
+  margin-right: 1em;
 }
