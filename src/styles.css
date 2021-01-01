@@ -8,6 +8,7 @@ body {
   background-blend-mode: screen;
 }
 
+/*spinner*/
 .spinner {
   display: inline-block;
   width: 50px;
@@ -29,4 +30,12 @@ body {
   to {
     -webkit-transform: rotate(360deg);
   }
+}
+/*end spinner*/
+
+latex-js {
+  display: inline;
+  width: 10%;
+  border: .5px solid rgba(0, 0, 0 , .1);
+  margin-right: 2em;
 }

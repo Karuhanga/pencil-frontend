@@ -4,7 +4,6 @@ import "node_modules/medium-editor/dist/js/medium-editor.min.js";
 import * as moment from 'moment';
 
 import {PersistenceService} from "../persistence.service";
-import {parseLatex} from "./extensions";
 
 
 const PERSIST_LAG_SECONDS = 15;
@@ -59,13 +58,16 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
 
   private setupSubscribers() {
     this.mediumEditor?.subscribe('editableInput', () => {
+      console.log("subscriber called...")
       const currentContent = this.mediumEditor?.getContent();
-      const newContent = parseLatex(currentContent) || "";
+      const newContent = this.parseLatex(currentContent) || "";
 
       if (currentContent === newContent) return;
 
+      console.log("setting...", currentContent, newContent)
       this.mediumEditor?.setContent(newContent);
       if (this.shouldSave()) {
+        console.log("saving...")
         this.persistenceService.writeNote(newContent).then(() => {
           this.lastUpdated = moment();
         }).catch(console.error);
@@ -75,5 +77,13 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
 
   private shouldSave() {
     return !this.lastUpdated || (moment().diff(this.lastUpdated) / 1000) > PERSIST_LAG_SECONDS;
+  }
+
+  private parseLatex(html?: string) {
+    console.log("parsing...")
+    return html?.replace(/\$(.*?)\$/g, (formula, withoutDollars) => {
+      console.log("replacing...")
+      return `<latex-js baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">\\ ${withoutDollars}</latex-js>`
+    })
   }
 }
