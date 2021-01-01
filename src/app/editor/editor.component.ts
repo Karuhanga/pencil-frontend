@@ -81,7 +81,7 @@ export class EditorComponent implements OnDestroy, AfterViewInit {
     // not very performant, but as mentioned earlier, I needed more time to figure out why the extension's change
     // listeners weren't being triggered. If those worked, we an restrict this parsing to a single, tiny node :)
     return html?.replace(/\$(.*?)\$/g, (formula, withoutDollars) => {
-      return `<latex-js baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">\\[ ${withoutDollars} \\]</latex-js>`
+      return `<span>&#8203;</span><latex-js baseURL="https://cdn.jsdelivr.net/npm/latex.js/dist/">\\[ ${withoutDollars} \\]</latex-js><span>&#8203;</span>`
     })
   }
 }
