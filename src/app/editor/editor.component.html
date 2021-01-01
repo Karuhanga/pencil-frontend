@@ -1,11 +1,22 @@
 <style>
-  .hidden {
+  #editor.hidden {
     visibility: hidden;
+  }
+
+  #last-updated {
+    width: 100%;
+    padding-right: 20px;
+    text-align: end;
+    font-style: italic;
+    font-size: smaller;
+    text-decoration: underline;
   }
 
   #editor-container {
     margin: 6vh 6vw;
-    border-top: .5px solid black;
+    padding: 3vh 3vw;
+    border: .5px solid rgba(0, 0, 0 , .1);
+    min-height: 50vw;
   }
 
   #editor-container [contenteditable="true"]:focus {
@@ -14,11 +25,18 @@
 
   #loading {
     margin-top: 10vw;
-    margin-left: 50%;
+    text-align: center;
   }
 </style>
 
-<div id="editor-container">
-  <div id="loading" class="spinner" [class.hidden]="!contentLoading"></div>
-  <textarea #editor [class.hidden]="contentLoading"></textarea>
+<div>
+  <div id="editor-container">
+    <div id="loading" *ngIf="contentLoading">
+      <span class="spinner"></span>
+      <br>
+      <small>Rolling out your scroll, sire</small>
+    </div>
+    <div id="last-updated" *ngIf="lastUpdated">Last synced: {{lastUpdated.fromNow()}}</div>
+    <div #editor id="editor" [class.hidden]="contentLoading"></div>
+  </div>
 </div>

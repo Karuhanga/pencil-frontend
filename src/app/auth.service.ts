@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {FirebaseService} from "./firebase.service";
 
 import firebase from "firebase/app";
@@ -12,7 +12,7 @@ import {BehaviorSubject} from "rxjs";
 })
 export class AuthService {
   private ui: firebaseui.auth.AuthUI;
-  readonly userSubject = new BehaviorSubject<firebase.User|null>(null);
+  readonly userSubject = new BehaviorSubject<firebase.User | null>(null);
 
   constructor(private firebaseService: FirebaseService) {
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
@@ -22,6 +22,7 @@ export class AuthService {
 
   initLoginButton(element: string, onSetupComplete: () => void) {
     const authService = this;
+
     function setupLoginButton() {
       authService.ui.start(element, {
         signInOptions: [

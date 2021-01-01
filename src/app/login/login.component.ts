@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from "../auth.service";
 
 @Component({
@@ -11,7 +11,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-  ) { }
+  ) {
+  }
 
   ngOnInit(): void {
     this.authService.initLoginButton('#firebaseui-auth-container', () => {
